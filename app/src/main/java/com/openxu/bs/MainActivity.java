@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void measurePicSize(){
-        //pic1  233*220
+        //pic1  223*220
         //实际大小：93.4 KB (95,646 字节)
         //占用空间96.0 KB (98,304 字节)
         String result = "";
@@ -52,12 +52,26 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, "输入流大小："+lenght+"B");   //95646
 
             BitmapFactory.Options newOpts = new BitmapFactory.Options();
-            newOpts.inPreferredConfig = Bitmap.Config.ALPHA_8;
-            Bitmap bitmap = BitmapFactory.decodeStream(in, null, newOpts);
-            int w = newOpts.outWidth;
-            int h = newOpts.outHeight;
-            Log.v(TAG, "图片宽高："+w+"*"+h);       //223*220
-            Log.v(TAG, "bitmap占用内容大小："+bitmap.getByteCount()+"B");   //196240
+            //android.content.res.Resources来取得一个张图片时，它也是以该格式来构建BitMap的
+            //从 Android4.0 开始，该选项无效。即使设置为该值，系统任然会采用  ARGB_8888 来构造图片
+            newOpts.inPreferredConfig = Bitmap.Config.ALPHA_8;    //一个像素＝1bites
+            Bitmap bitmap1 = BitmapFactory.decodeStream(in, null, newOpts);
+            Log.v(TAG, "ALPHA_8占用内容大小："+bitmap1.getByteCount()+"B");   //196240 = 4*223*220
+
+            newOpts = new BitmapFactory.Options();
+            newOpts.inPreferredConfig = Bitmap.Config.ARGB_4444;    //一个像素＝2bites
+            Bitmap bitmap2 = BitmapFactory.decodeStream(in, null, newOpts);
+            Log.v(TAG, "ARGB_4444占用内容大小："+bitmap2.getByteCount()+"B");   //98120 = 2*223*220
+
+            newOpts = new BitmapFactory.Options();
+            newOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;    //一个像素＝4bites
+            Bitmap bitmap3 = BitmapFactory.decodeStream(in, null, newOpts);
+            Log.v(TAG, "ARGB_8888占用内容大小："+bitmap1.getByteCount()+"B");   //196240 = 4*223*220
+
+            newOpts = new BitmapFactory.Options();
+            newOpts.inPreferredConfig = Bitmap.Config.RGB_565;    //一个像素＝2bites
+            Bitmap bitmap4 = BitmapFactory.decodeStream(in, null, newOpts);
+            Log.v(TAG, "RGB_565占用内容大小："+bitmap4.getByteCount()+"B");   //98120 = 2*223*220
 
             Log.v(TAG, "进程可用总的内存大小："+Runtime.getRuntime().maxMemory()
                     +",进程已用的内存大小:"+Runtime.getRuntime().totalMemory() );
