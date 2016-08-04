@@ -43,29 +43,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void measurePicSize(){
-
-        String result = "";
         try {
             //pic1.png基本信息：80*80  9.41 KB (9,646 字节)
             InputStream in = getResources().getAssets().open("pic1.png");
             int lenght = in.available();
             Log.v(TAG, "输入流大小："+lenght+"B");   //9646
             BitmapFactory.Options newOpts = new BitmapFactory.Options();
-            newOpts.inPreferredConfig = Bitmap.Config.ALPHA_8;     //一个像素＝1bites
+            newOpts.inPreferredConfig = Bitmap.Config.ALPHA_8;     //一个像素＝1bites   此格式无效
             Bitmap bitmap1 = BitmapFactory.decodeStream(in, null, newOpts);
-            newOpts.inPreferredConfig = Bitmap.Config.ARGB_4444;    //一个像素＝2bites
+            newOpts.inPreferredConfig = Bitmap.Config.ARGB_4444;    //一个像素＝2bites  此格式不建议使用，无效
             Bitmap bitmap2 = BitmapFactory.decodeStream(in, null, newOpts);
-            newOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;    //一个像素＝4bites
+            newOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;    //一个像素＝4bites  默认格式
             Bitmap bitmap3 = BitmapFactory.decodeStream(in, null, newOpts);
-            //android.content.res.Resources来取得一个张图片时，它也是以RGB_565格式来构建BitMap的
-            //从 Android4.0 开始，该选项无效。即使设置为该值，系统任然会采用  ARGB_8888 来构造图片
-            newOpts.inPreferredConfig = Bitmap.Config.RGB_565;    //一个像素＝2bites
+            newOpts.inPreferredConfig = Bitmap.Config.RGB_565;    //一个像素＝2bites    此格式无效
             Bitmap bitmap4 = BitmapFactory.decodeStream(in, null, newOpts);
-            Log.v(TAG, "pic1用ALPHA_8模式打开占用内容大小："+bitmap1.getByteCount()+"字节B");    //25600 = 4*80*80
-            Log.v(TAG, "pic1用ARGB_4444模式打开占用内容大小："+bitmap2.getByteCount()+"字节B");  //12800 = 2*80*80
-            Log.v(TAG, "pic1用ARGB_8888模式打开占用内容大小："+bitmap3.getByteCount()+"字节B");  //25600 = 4*80*80
-            Log.v(TAG, "pic1用RGB_565模式打开占用内容大小："+bitmap4.getByteCount()+"字节B");    //25600 = 4*80*80
-
+            Log.v(TAG, "pic1用ALPHA_8格式打开占用内容大小："+bitmap1.getByteCount()+"字节B");    //25600 = 80*80*4
+            Log.v(TAG, "pic1用ARGB_4444格式打开占用内容大小："+bitmap2.getByteCount()+"字节B");  //12800 = 80*80*2
+            Log.v(TAG, "pic1用ARGB_8888格式打开占用内容大小："+bitmap3.getByteCount()+"字节B");  //25600 = 80*80*4
+            Log.v(TAG, "pic1用RGB_565格式打开占用内容大小："+bitmap4.getByteCount()+"字节B");    //25600 = 80*80*4
 
             //pic2.png基本信息：80*80  9.06 KB (9,282 字节)
             in = getResources().getAssets().open("pic2.png");
@@ -77,17 +72,12 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap6 = BitmapFactory.decodeStream(in, null, newOpts);
             newOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;    //一个像素＝4bites
             Bitmap bitmap7 = BitmapFactory.decodeStream(in, null, newOpts);
-            //android.content.res.Resources来取得一个张图片时，它也是以RGB_565格式来构建BitMap的
-            //从 Android4.0 开始，该选项无效。即使设置为该值，系统任然会采用  ARGB_8888 来构造图片
             newOpts.inPreferredConfig = Bitmap.Config.RGB_565;    //一个像素＝2bites
             Bitmap bitmap8 = BitmapFactory.decodeStream(in, null, newOpts);
-            Log.v(TAG, "pic2用ALPHA_8模式打开占用内容大小："+bitmap5.getByteCount()+"字节B");    //25600 = 4*80*80
-            Log.v(TAG, "pic2用ARGB_4444模式打开占用内容大小："+bitmap6.getByteCount()+"字节B");  //12800 = 2*80*80
-            Log.v(TAG, "pic2用ARGB_8888模式打开占用内容大小："+bitmap7.getByteCount()+"字节B");  //25600 = 4*80*80
-            Log.v(TAG, "pic2用RGB_565模式打开占用内容大小："+bitmap8.getByteCount()+"字节B");    //25600 = 4*80*80
-
-
-
+            Log.v(TAG, "pic2用ALPHA_8格式打开占用内容大小："+bitmap5.getByteCount()+"字节B");    //25600 = 80*80*4
+            Log.v(TAG, "pic2用ARGB_4444格式打开占用内容大小："+bitmap6.getByteCount()+"字节B");  //12800 = 80*80*2
+            Log.v(TAG, "pic2用ARGB_8888格式打开占用内容大小："+bitmap7.getByteCount()+"字节B");  //25600 = 80*80*4
+            Log.v(TAG, "pic2用RGB_565格式打开占用内容大小："+bitmap8.getByteCount()+"字节B");    //25600 = 80*80*4
         } catch (Exception e) {
             e.printStackTrace();
         }
