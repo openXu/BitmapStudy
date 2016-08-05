@@ -9,5 +9,16 @@
         android:id="@+id/btn_local_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="本地照片" />
+        android:text="图片的各种大小" />
+
+    <Button
+        android:id="@+id/btn_dpi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="像素密度" />
+    <Button
+        android:id="@+id/btn_dpi_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="不同的drawable目录" />
 </LinearLayout>
