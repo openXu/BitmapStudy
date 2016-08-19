@@ -18,6 +18,7 @@
         <activity android:name=".PicSizeActivity"/>
         <activity android:name=".DipActivity"/>
         <activity android:name=".DpiPicActivity"/>
+        <activity android:name=".PicCompressActivity"/>
     </application>
 
 </manifest>

@@ -9,16 +9,21 @@
         android:id="@+id/btn_local_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="图片的各种大小" />
+        android:text="加载assets目录中图片，并计算大小" />
 
     <Button
-        android:id="@+id/btn_dpi"
+        android:id="@+id/btn_dip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="像素密度" />
+        android:text="dip适配效果" />
     <Button
         android:id="@+id/btn_dpi_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="不同的drawable目录" />
+        android:text="不同密度的drawable目录对图片大小的影响" />
+    <Button
+        android:id="@+id/btn_pic_compress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="图片压缩" />
 </LinearLayout>

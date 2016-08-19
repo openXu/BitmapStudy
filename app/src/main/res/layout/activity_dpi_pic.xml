@@ -32,12 +32,18 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dip"
         android:scaleType="fitXY"
-        android:src="@drawable/pic_dpi"/>
+        android:src="@drawable/pic_res"/>
 
-    <TextView
-        android:id="@+id/tv_hit"
-        android:padding="20dip"
-        android:lineSpacingExtra="5dip"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        <TextView
+            android:id="@+id/tv_hit"
+            android:padding="20dip"
+            android:lineSpacingExtra="5dip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </ScrollView>
+
 </LinearLayout>

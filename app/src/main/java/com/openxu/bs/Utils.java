@@ -13,30 +13,30 @@ package com.openxu.bs;
 public class Utils {
 
     /**
-     * 根据基准比例获取首先加载图片资源的drawable文件夹的名称
-     * @param scale
+     * 根据系统基准比例获取默认的drawable文件夹的名称
+     * @param density
      */
-    public static String getDrawableName(float scale){
-        if(scale == 0.75f){
+    public static String getDrawableName(float density){
+        if(density == 0.75f){
             return "drawable-ldpi";
-        }else if(scale == 1){
+        }else if(density == 1){
             return "drawable-mdpi";
-        }else if(scale == 1.5f){
+        }else if(density == 1.5f){
             return "drawable-hdpi";
-        }else if(scale == 2){
+        }else if(density == 2){
             return "drawable-xhdpi";
-        }else if(scale == 3){
+        }else if(density == 3){
             return "drawable-xxhdpi";
-        }else if(scale == 4){
+        }else if(density == 4){
             return "drawable-xxxhdpi";
         }
         return "";
     }
 
     /**
-     * 根据基准比例获取首先加载图片资源的drawable文件夹的名称
+     * 根据drawable文件夹的名称获取对应的系统基准比例
      */
-    public static float getScaleByDrawablename(String drawableName){
+    public static float getDensityByDrawablename(String drawableName){
         switch (drawableName){
             case "drawable":
                 return 1;
@@ -58,35 +58,12 @@ public class Utils {
 
 
     /**
-     * 获取不同drawable目录图片被加载后，与图片的原始大小的缩放比例
-     * @param scale
+     * 根据图片存放目录名称和系统基准比例，计算图片需要放大或者缩小的比例
+     * @param density
      */
-    public static float getPicScale(String drawableName, float scale){
-        float drawbleScale = 0;
-        switch (drawableName){
-            case "drawable":
-                drawbleScale = 1;
-                break;
-            case "drawable-ldpi":
-                drawbleScale = 0.75f;
-                break;
-            case "drawable-mdpi":
-                drawbleScale = 1;
-                break;
-            case "drawable-hdpi":
-                drawbleScale = 1.5f;
-                break;
-            case "drawable-xhdpi":
-                drawbleScale = 2;
-                break;
-            case "drawable-xxhdpi":
-                drawbleScale = 3;
-                break;
-            case "drawable-xxxhdpi":
-                drawbleScale = 4;
-                break;
-        }
-        return scale/drawbleScale;
+    public static float getPicScale(String drawableName, float density){
+        float drawbleDensity = getDensityByDrawablename(drawableName);
+        return density/drawbleDensity;
     }
 
 

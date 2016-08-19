@@ -11,7 +11,7 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class DipActivity extends AppCompatActivity {
+public class PicCompressActivity extends AppCompatActivity {
 
     private String TAG = "DipActivity";
 
