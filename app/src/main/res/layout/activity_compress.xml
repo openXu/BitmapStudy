@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dip"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_fbl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#ff0000"
+        android:gravity="center"
+        android:layout_marginTop="10dip"
+        android:textSize="16sp"
+        android:text="系统分辨率："/>
+    <TextView
+        android:id="@+id/tv_hit1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:textSize="16sp"
+        android:text="原图展示："/>
+    <ImageView
+        android:id="@+id/iv_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"/>
+
+    <TextView
+        android:id="@+id/tv_hit2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:textSize="16sp"
+        android:text="缩略展示："/>
+    <ImageView
+        android:id="@+id/iv_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dip" />
+</LinearLayout>
