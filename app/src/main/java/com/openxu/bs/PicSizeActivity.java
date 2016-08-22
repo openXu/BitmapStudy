@@ -13,6 +13,9 @@ import java.io.InputStream;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
+/**
+ * 不同格式的图片加载到内存中的大小分析
+ */
 public class PicSizeActivity extends AppCompatActivity {
 
     private String TAG = "PicSizeActivity";

@@ -13,6 +13,9 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
+/**
+ * 不同密度drawable目录资源图片加载到内存中的大小
+ */
 public class DpiPicActivity extends AppCompatActivity {
 
     private String TAG = "DpiPicActivity";
@@ -49,7 +52,6 @@ public class DpiPicActivity extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pic_res);
         Log.i(TAG, "bitmap大小："+bitmap.getWidth()+"*"+bitmap.getHeight());
         imageView.setImageBitmap(bitmap);
-
 
         String hint =  "手机分辨率: "+dm.widthPixels+"*"+dm.heightPixels+"\n"+
                 "dpi："+densityDpi+"  density："+systemDensity+"\n"+

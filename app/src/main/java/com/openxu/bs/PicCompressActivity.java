@@ -2,12 +2,11 @@ package com.openxu.bs;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +18,9 @@ import java.io.FileOutputStream;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
+/**
+ * 图片压缩
+ */
 public class PicCompressActivity extends AppCompatActivity {
 
     private String TAG = "PicCompressActivity";
@@ -49,10 +51,15 @@ public class PicCompressActivity extends AppCompatActivity {
         Log.i(TAG, "原始bitmap大小："+bitmap.getWidth()+"*"+bitmap.getHeight());
         tv_hit1.setText("原图展示："+bitmap.getWidth()+"*"+bitmap.getHeight());
         iv_1.setImageBitmap(bitmap);
-
-
+        iv_1.setImageResource(R.drawable.pic_res);
+iv_1.setImageDrawable();
 
     }
+
+
+
+
+
 
 
 
@@ -103,7 +110,7 @@ public class PicCompressActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return bitFile;
+        return null;
     }
 
     /**
