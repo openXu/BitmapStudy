@@ -1,5 +1,6 @@
 package com.openxu.bs;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -12,7 +13,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class DipActivity extends AppCompatActivity {
-
+Activity
     private String TAG = "DipActivity";
 
     @Bind(R.id.btn_dip)

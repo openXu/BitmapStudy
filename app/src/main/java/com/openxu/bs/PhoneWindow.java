@@ -3981,6 +3981,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
             mContentParent = generateLayout(mDecor);
 
             // Set up decor part of UI to ignore fitsSystemWindows if appropriate.
+            //
             mDecor.makeOptionalFitsSystemWindows();
 
             final DecorContentParent decorContentParent = (DecorContentParent) mDecor.findViewById(
