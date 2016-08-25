@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.app.VoiceInteractor;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -16,16 +17,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.RemoteException;
+import android.os.StrictMode;
 import android.os.Trace;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Scene;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.util.Xml;
+import android.view.ContextThemeWrapper;
 import android.view.InflateException;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -34,6 +40,8 @@ import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -57,114 +65,178 @@ import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
  * version : 1.0
  * class describe：
  */
-public class ViewInfloat extends Activity {
+public class ViewInfloat extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity);
+
+
+        ViewGroup
+        Activity
         //setContentView(new TextView(this));
         //setContentView(new TextView(this),new ViewGroup.LayoutParams(...));
     }
 
-    public View inflate(XmlPullParser parser, ViewGroup root, boolean attachToRoot) {
-        synchronized (mConstructorArgs) {
-            Trace.traceBegin(Trace.TRACE_TAG_VIEW, "inflate");
+    ViewGroup
+    public void addView(View child, int index, LayoutParams params) {
+        if (DBG) {
+            System.out.println(this + " addView");
+        }
 
-            final Context inflaterContext = mContext;
-            final AttributeSet attrs = Xml.asAttributeSet(parser);
-            Context lastContext = (Context) mConstructorArgs[0];
-            mConstructorArgs[0] = inflaterContext;
-            //最终返回的View
-            View result = root;
+        if (child == null) {
+            throw new IllegalArgumentException("Cannot add a null child view to a ViewGroup");
+        }
 
-            try {
-                int type;
-                //循环知道解析到开始标签<>或者结尾标签</>
-                while ((type = parser.next()) != XmlPullParser.START_TAG &&
-                        type != XmlPullParser.END_DOCUMENT) {
-                    // Empty
+        // addViewInner() will call child.requestLayout() when setting the new LayoutParams
+        // therefore, we call requestLayout() on ourselves before, so that the child's request
+        // will be blocked at our level
+        requestLayout();
+        invalidate(true);
+        addViewInner(child, index, params, false);
+    }
+
+    View
+    @CallSuper
+    public void requestLayout() {
+        if (mMeasureCache != null) mMeasureCache.clear();
+
+        if (mAttachInfo != null && mAttachInfo.mViewRequestingLayout == null) {
+            // Only trigger request-during-layout logic if this is the view requesting it,
+            // not the views in its parent hierarchy
+            ViewRootImpl viewRoot = getViewRootImpl();
+            if (viewRoot != null && viewRoot.isInLayout()) {
+                if (!viewRoot.requestLayoutDuringLayout(this)) {
+                    return;
                 }
-                //第一次解析到的不是开始标签<>，说明layout文件没有<>标签,xml格式错误
-                if (type != XmlPullParser.START_TAG) {
-                    throw new InflateException(parser.getPositionDescription()
-                            + ": No start tag found!");
-                }
-
-                //此处解析到的name是layout布局文件第一个开始标签，也就是layout最外层的View
-                final String name = parser.getName();
-                ...
-                if (TAG_MERGE.equals(name)) {
-                    if (root == null || !attachToRoot) {
-                        throw new InflateException("<merge /> can be used only with a valid "
-                                + "ViewGroup root and attachToRoot=true");
-                    }
-
-                    rInflate(parser, root, inflaterContext, attrs, false);
-                } else {
-                    // Temp is the root view that was found in the xml
-                    final View temp = createViewFromTag(root, name, inflaterContext, attrs);
-
-                    ViewGroup.LayoutParams params = null;
-
-                    if (root != null) {
-                        if (DEBUG) {
-                            System.out.println("Creating params from root: " +
-                                    root);
-                        }
-                        // Create layout params that match root, if supplied
-                        params = root.generateLayoutParams(attrs);
-                        if (!attachToRoot) {
-                            // Set the layout params for temp if we are not
-                            // attaching. (If we are, we use addView, below)
-                            temp.setLayoutParams(params);
-                        }
-                    }
-
-                    if (DEBUG) {
-                        System.out.println("-----> start inflating children");
-                    }
-
-                    // Inflate all children under temp against its context.
-                    rInflateChildren(parser, temp, attrs, true);
-
-                    if (DEBUG) {
-                        System.out.println("-----> done inflating children");
-                    }
-
-                    // We are supposed to attach all the views we found (int temp)
-                    // to root. Do that now.
-                    if (root != null && attachToRoot) {
-                        root.addView(temp, params);
-                    }
-
-                    // Decide whether to return the root that was passed in or the
-                    // top view found in xml.
-                    if (root == null || !attachToRoot) {
-                        result = temp;
-                    }
-                }
-
-            } catch (XmlPullParserException e) {
-                InflateException ex = new InflateException(e.getMessage());
-                ex.initCause(e);
-                throw ex;
-            } catch (Exception e) {
-                InflateException ex = new InflateException(
-                        parser.getPositionDescription()
-                                + ": " + e.getMessage());
-                ex.initCause(e);
-                throw ex;
-            } finally {
-                // Don't retain static reference on context.
-                mConstructorArgs[0] = lastContext;
-                mConstructorArgs[1] = null;
             }
+            mAttachInfo.mViewRequestingLayout = this;
+        }
 
-            Trace.traceEnd(Trace.TRACE_TAG_VIEW);
+        mPrivateFlags |= PFLAG_FORCE_LAYOUT;
+        mPrivateFlags |= PFLAG_INVALIDATED;
 
-            return result;
+        if (mParent != null && !mParent.isLayoutRequested()) {
+            mParent.requestLayout();
+        }
+        if (mAttachInfo != null && mAttachInfo.mViewRequestingLayout == this) {
+            mAttachInfo.mViewRequestingLayout = null;
         }
     }
+
+
+
+    ActivityThread创建Activity
+
+
+
+
+    final void handleResumeActivity(IBinder token,
+                                    boolean clearHide, boolean isForward, boolean reallyResume) {
+        if (r != null) {
+            final Activity a = r.activity;
+
+            final int forwardBit = isForward ?
+                    WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION : 0;
+
+            boolean willBeVisible = !a.mStartedActivity;
+            ...
+            /*
+             * 如果window没有被添加到WindowManager中，并且当前activity没有finish()或者开启另一个Activity;
+             * 意思就是当前activity正要被显示出来了，这时候将window添加到windowManager中
+             */
+            if (r.window == null && !a.mFinished && willBeVisible) {
+                r.window = r.activity.getWindow();
+                //获取activity中mWindow（PhoneWindow对象）的mDecor，也就是顶层窗口
+                View decor = r.window.getDecorView();
+                //设置顶层窗口可见
+                decor.setVisibility(View.INVISIBLE);
+                //获取WindowManager对象
+                ViewManager wm = a.getWindowManager();
+                //创建一个布局参数
+                WindowManager.LayoutParams l = r.window.getAttributes();
+                a.mDecor = decor;
+                l.type = WindowManager.LayoutParams.TYPE_BASE_APPLICATION;
+                l.softInputMode |= forwardBit;
+                if (a.mVisibleFromClient) {
+                    a.mWindowAdded = true;
+                    //将顶层窗口mDecor添加到WindowManager中
+                    wm.addView(decor, l);
+                }
+
+            } else if (!willBeVisible) {
+                //如果window已经被添加，但在resume之前开启了另一个activity，这时候当前activity没有在最顶端（失去焦点）
+                r.hideForNow = true;
+            }
+
+            // Get rid of anything left hanging around.
+            cleanUpPendingRemoveWindows(r);
+
+            // The window is now visible if it has been added, we are not
+            // simply finishing, and we are not starting another activity.
+            if (!r.activity.mFinished && willBeVisible
+                    && r.activity.mDecor != null && !r.hideForNow) {
+                if (r.newConfig != null) {
+                    r.tmpConfig.setTo(r.newConfig);
+                    if (r.overrideConfig != null) {
+                        r.tmpConfig.updateFrom(r.overrideConfig);
+                    }
+                    if (DEBUG_CONFIGURATION) Slog.v(TAG, "Resuming activity "
+                            + r.activityInfo.name + " with newConfig " + r.tmpConfig);
+                    performConfigurationChanged(r.activity, r.tmpConfig);
+                    freeTextLayoutCachesIfNeeded(r.activity.mCurrentConfig.diff(r.tmpConfig));
+                    r.newConfig = null;
+                }
+                if (localLOGV) Slog.v(TAG, "Resuming " + r + " with isForward="
+                        + isForward);
+                WindowManager.LayoutParams l = r.window.getAttributes();
+                if ((l.softInputMode
+                        & WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION)
+                        != forwardBit) {
+                    l.softInputMode = (l.softInputMode
+                            & (~WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION))
+                            | forwardBit;
+                    if (r.activity.mVisibleFromClient) {
+                        ViewManager wm = a.getWindowManager();
+                        View decor = r.window.getDecorView();
+                        wm.updateViewLayout(decor, l);
+                    }
+                }
+                r.activity.mVisibleFromServer = true;
+                mNumVisibleActivities++;
+                if (r.activity.mVisibleFromClient) {
+                    r.activity.makeVisible();
+                }
+            }
+
+            if (!r.onlyLocalRequest) {
+                r.nextIdle = mNewActivities;
+                mNewActivities = r;
+                if (localLOGV) Slog.v(
+                        TAG, "Scheduling idle handler for " + r);
+                Looper.myQueue().addIdleHandler(new Idler());
+            }
+            r.onlyLocalRequest = false;
+
+            // Tell the activity manager we have resumed.
+            if (reallyResume) {
+                try {
+                    ActivityManagerNative.getDefault().activityResumed(token);
+                } catch (RemoteException ex) {
+                }
+            }
+
+        } else {
+            // If an exception was thrown when trying to resume, then
+            // just end this activity.
+            try {
+                ActivityManagerNative.getDefault()
+                        .finishActivity(token, Activity.RESULT_CANCELED, null, false);
+            } catch (RemoteException ex) {
+            }
+        }
+    }
+
 
 }
