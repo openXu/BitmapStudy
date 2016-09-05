@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openxu.bs;
+package com.openxu.bs.androidsuorce;
 
 import static android.Manifest.permission.INTERACT_ACROSS_USERS;
 import static android.Manifest.permission.INTERACT_ACROSS_USERS_FULL;
@@ -90,6 +90,8 @@ import com.android.server.wm.AppTransition;
 import com.android.server.wm.WindowManagerService;
 import com.google.android.collect.Lists;
 import com.google.android.collect.Maps;
+import com.openxu.bs.R;
+import com.openxu.bs.ServiceManager;
 
 import libcore.io.IoUtils;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openxu.bs;
+package com.openxu.bs.androidsuorce;
 
 import static android.Manifest.permission.START_ANY_ACTIVITY;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -105,6 +105,7 @@ import com.android.internal.widget.LockPatternUtils;
 import com.android.server.LocalServices;
 import com.android.server.am.ActivityStack.ActivityState;
 import com.android.server.wm.WindowManagerService;
+import com.openxu.bs.ServiceManager;
 
 
 import java.io.FileDescriptor;

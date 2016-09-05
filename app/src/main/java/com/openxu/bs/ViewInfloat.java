@@ -109,7 +109,6 @@ public class ViewInfloat extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity);
         startActivity(new );
-
         Activity
         //setContentView(new TextView(this));
         //setContentView(new TextView(this),new ViewGroup.LayoutParams(...));
