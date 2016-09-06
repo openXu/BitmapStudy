@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openxu.bs.androidsuorce;
+package com.android.server.am;
 
 import static android.Manifest.permission.INTERACT_ACROSS_USERS;
 import static android.Manifest.permission.INTERACT_ACROSS_USERS_FULL;
@@ -90,8 +90,6 @@ import com.android.server.wm.AppTransition;
 import com.android.server.wm.WindowManagerService;
 import com.google.android.collect.Lists;
 import com.google.android.collect.Maps;
-import com.openxu.bs.R;
-import com.openxu.bs.ServiceManager;
 
 import libcore.io.IoUtils;
 
@@ -559,7 +557,7 @@ public final class ActivityManagerService extends ActivityManagerNative
      * is the pid of the caller who requested it (we hold a death
      * link on it).
      */
-    abstract class ForegroundToken implements DeathRecipient {
+    abstract class ForegroundToken implements IBinder.DeathRecipient {
         int pid;
         IBinder token;
     }
@@ -1207,7 +1205,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     private UserManagerService mUserManager;
 
-    private final class AppDeathRecipient implements DeathRecipient {
+    private final class AppDeathRecipient implements IBinder.DeathRecipient {
         final ProcessRecord mApp;
         final int mPid;
         final IApplicationThread mAppThread;
@@ -1931,7 +1929,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                 updateLruProcessLocked(app, false, null);
                 updateOomAdjLocked();
             }
-        } catch (NameNotFoundException e) {
+        } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(
                     "Unable to find android system package", e);
         }
@@ -1963,11 +1961,11 @@ public final class ActivityManagerService extends ActivityManagerNative
 
         @Override
         protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
-            if (mActivityManagerService.checkCallingPermission(Manifest.permission.DUMP)
+            if (mActivityManagerService.checkCallingPermission(android.Manifest.permission.DUMP)
                     != PackageManager.PERMISSION_GRANTED) {
                 pw.println("Permission Denial: can't dump meminfo from from pid="
                         + Binder.getCallingPid() + ", uid=" + Binder.getCallingUid()
-                        + " without permission " + Manifest.permission.DUMP);
+                        + " without permission " + android.Manifest.permission.DUMP);
                 return;
             }
 
@@ -1983,11 +1981,11 @@ public final class ActivityManagerService extends ActivityManagerNative
 
         @Override
         protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
-            if (mActivityManagerService.checkCallingPermission(Manifest.permission.DUMP)
+            if (mActivityManagerService.checkCallingPermission(android.Manifest.permission.DUMP)
                     != PackageManager.PERMISSION_GRANTED) {
                 pw.println("Permission Denial: can't dump gfxinfo from from pid="
                         + Binder.getCallingPid() + ", uid=" + Binder.getCallingUid()
-                        + " without permission " + Manifest.permission.DUMP);
+                        + " without permission " + android.Manifest.permission.DUMP);
                 return;
             }
 
@@ -2003,11 +2001,11 @@ public final class ActivityManagerService extends ActivityManagerNative
 
         @Override
         protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
-            if (mActivityManagerService.checkCallingPermission(Manifest.permission.DUMP)
+            if (mActivityManagerService.checkCallingPermission(android.Manifest.permission.DUMP)
                     != PackageManager.PERMISSION_GRANTED) {
                 pw.println("Permission Denial: can't dump dbinfo from from pid="
                         + Binder.getCallingPid() + ", uid=" + Binder.getCallingUid()
-                        + " without permission " + Manifest.permission.DUMP);
+                        + " without permission " + android.Manifest.permission.DUMP);
                 return;
             }
 
@@ -2023,11 +2021,11 @@ public final class ActivityManagerService extends ActivityManagerNative
 
         @Override
         protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
-            if (mActivityManagerService.checkCallingPermission(Manifest.permission.DUMP)
+            if (mActivityManagerService.checkCallingPermission(android.Manifest.permission.DUMP)
                     != PackageManager.PERMISSION_GRANTED) {
                 pw.println("Permission Denial: can't dump cpuinfo from from pid="
                         + Binder.getCallingPid() + ", uid=" + Binder.getCallingUid()
-                        + " without permission " + Manifest.permission.DUMP);
+                        + " without permission " + android.Manifest.permission.DUMP);
                 return;
             }
 
@@ -2067,7 +2065,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         Slog.i(TAG, "Memory class: " + ActivityManager.staticGetMemoryClass());
 
         mHandlerThread = new ServiceThread(TAG,
-                Process.THREAD_PRIORITY_FOREGROUND, false /*allowIo*/);
+                android.os.Process.THREAD_PRIORITY_FOREGROUND, false /*allowIo*/);
         mHandlerThread.start();
         mHandler = new MainHandler(mHandlerThread.getLooper());
 
@@ -2934,14 +2932,14 @@ public final class ActivityManagerService extends ActivityManagerNative
                     if (Environment.isExternalStorageEmulated()) {
                         checkTime(startTime, "startProcess: checking external storage perm");
                         if (pm.checkPermission(
-                                Manifest.permission.ACCESS_ALL_EXTERNAL_STORAGE,
+                                android.Manifest.permission.ACCESS_ALL_EXTERNAL_STORAGE,
                                 app.info.packageName) == PERMISSION_GRANTED) {
                             mountExternal = Zygote.MOUNT_EXTERNAL_MULTIUSER_ALL;
                         } else {
                             mountExternal = Zygote.MOUNT_EXTERNAL_MULTIUSER;
                         }
                     }
-                } catch (NameNotFoundException e) {
+                } catch (PackageManager.NameNotFoundException e) {
                     Slog.w(TAG, "Unable to retrieve gids", e);
                 }
 
@@ -3249,7 +3247,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setFrontActivityScreenCompatMode(int mode) {
-        enforceCallingPermission(Manifest.permission.SET_SCREEN_COMPATIBILITY,
+        enforceCallingPermission(android.Manifest.permission.SET_SCREEN_COMPATIBILITY,
                 "setFrontActivityScreenCompatMode");
         synchronized (this) {
             mCompatModePackages.setFrontActivityScreenCompatModeLocked(mode);
@@ -3266,7 +3264,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setPackageScreenCompatMode(String packageName, int mode) {
-        enforceCallingPermission(Manifest.permission.SET_SCREEN_COMPATIBILITY,
+        enforceCallingPermission(android.Manifest.permission.SET_SCREEN_COMPATIBILITY,
                 "setPackageScreenCompatMode");
         synchronized (this) {
             mCompatModePackages.setPackageScreenCompatModeLocked(packageName, mode);
@@ -3283,7 +3281,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setPackageAskScreenCompat(String packageName, boolean ask) {
-        enforceCallingPermission(Manifest.permission.SET_SCREEN_COMPATIBILITY,
+        enforceCallingPermission(android.Manifest.permission.SET_SCREEN_COMPATIBILITY,
                 "setPackageAskScreenCompat");
         synchronized (this) {
             mCompatModePackages.setPackageAskCompatModeLocked(packageName, ask);
@@ -3346,8 +3344,6 @@ public final class ActivityManagerService extends ActivityManagerNative
         mProcessObservers.finishBroadcast();
     }
 
-
-
     @Override
     public final int startActivity(IApplicationThread caller, String callingPackage,
             Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,
@@ -3364,7 +3360,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         enforceNotIsolatedCaller("startActivity");
         userId = handleIncomingUser(Binder.getCallingPid(), Binder.getCallingUid(), userId,
                 false, ALLOW_FULL_ONLY, "startActivity", null);
-        //mStackSupervisor的类型是ActivityStackSupervisor
+        // TODO: Switch to user app stacks here.
         return mStackSupervisor.startActivityMayWait(caller, -1, callingPackage, intent,
                 resolvedType, null, null, resultTo, resultWho, requestCode, startFlags,
                 profilerInfo, null, null, options, userId, null, null);
@@ -3508,7 +3504,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             String msg = "Permission Denial: startVoiceActivity() from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
-                    + " requires " + Manifest.permission.BIND_VOICE_INTERACTION;
+                    + " requires " + android.Manifest.permission.BIND_VOICE_INTERACTION;
             Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
@@ -4344,12 +4340,12 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public final void finishHeavyWeightApp() {
-        if (checkCallingPermission(Manifest.permission.FORCE_STOP_PACKAGES)
+        if (checkCallingPermission(android.Manifest.permission.FORCE_STOP_PACKAGES)
                 != PackageManager.PERMISSION_GRANTED) {
             String msg = "Permission Denial: finishHeavyWeightApp() from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
-                    + " requires " + Manifest.permission.FORCE_STOP_PACKAGES;
+                    + " requires " + android.Manifest.permission.FORCE_STOP_PACKAGES;
             Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
@@ -4378,12 +4374,12 @@ public final class ActivityManagerService extends ActivityManagerNative
     @Override
     public void crashApplication(int uid, int initialPid, String packageName,
             String message) {
-        if (checkCallingPermission(Manifest.permission.FORCE_STOP_PACKAGES)
+        if (checkCallingPermission(android.Manifest.permission.FORCE_STOP_PACKAGES)
                 != PackageManager.PERMISSION_GRANTED) {
             String msg = "Permission Denial: crashApplication() from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
-                    + " requires " + Manifest.permission.FORCE_STOP_PACKAGES;
+                    + " requires " + android.Manifest.permission.FORCE_STOP_PACKAGES;
             Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
@@ -5144,13 +5140,13 @@ public final class ActivityManagerService extends ActivityManagerNative
                     return false;
                 }
                 if (uid == pkgUid || checkComponentPermission(
-                        Manifest.permission.CLEAR_APP_USER_DATA,
+                        android.Manifest.permission.CLEAR_APP_USER_DATA,
                         pid, uid, -1, true)
                         == PackageManager.PERMISSION_GRANTED) {
                     forceStopPackageLocked(packageName, pkgUid, "clear data");
                 } else {
                     throw new SecurityException("PID " + pid + " does not have permission "
-                            + Manifest.permission.CLEAR_APP_USER_DATA + " to clear data"
+                            + android.Manifest.permission.CLEAR_APP_USER_DATA + " to clear data"
                                     + " of package " + packageName);
                 }
 
@@ -5189,14 +5185,14 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void killBackgroundProcesses(final String packageName, int userId) {
-        if (checkCallingPermission(Manifest.permission.KILL_BACKGROUND_PROCESSES)
+        if (checkCallingPermission(android.Manifest.permission.KILL_BACKGROUND_PROCESSES)
                 != PackageManager.PERMISSION_GRANTED &&
-                checkCallingPermission(Manifest.permission.RESTART_PACKAGES)
+                checkCallingPermission(android.Manifest.permission.RESTART_PACKAGES)
                         != PackageManager.PERMISSION_GRANTED) {
             String msg = "Permission Denial: killBackgroundProcesses() from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
-                    + " requires " + Manifest.permission.KILL_BACKGROUND_PROCESSES;
+                    + " requires " + android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
             Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
@@ -5226,12 +5222,12 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void killAllBackgroundProcesses() {
-        if (checkCallingPermission(Manifest.permission.KILL_BACKGROUND_PROCESSES)
+        if (checkCallingPermission(android.Manifest.permission.KILL_BACKGROUND_PROCESSES)
                 != PackageManager.PERMISSION_GRANTED) {
             String msg = "Permission Denial: killAllBackgroundProcesses() from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
-                    + " requires " + Manifest.permission.KILL_BACKGROUND_PROCESSES;
+                    + " requires " + android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
             Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
@@ -5274,12 +5270,12 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void forceStopPackage(final String packageName, int userId) {
-        if (checkCallingPermission(Manifest.permission.FORCE_STOP_PACKAGES)
+        if (checkCallingPermission(android.Manifest.permission.FORCE_STOP_PACKAGES)
                 != PackageManager.PERMISSION_GRANTED) {
             String msg = "Permission Denial: forceStopPackage() from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
-                    + " requires " + Manifest.permission.FORCE_STOP_PACKAGES;
+                    + " requires " + android.Manifest.permission.FORCE_STOP_PACKAGES;
             Slog.w(TAG, msg);
             throw new SecurityException(msg);
         }
@@ -6242,7 +6238,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                                     }
                                 },
                                 0, null, null,
-                                Manifest.permission.RECEIVE_BOOT_COMPLETED,
+                                android.Manifest.permission.RECEIVE_BOOT_COMPLETED,
                                 AppOpsManager.OP_NONE, true, false, MY_PID, Process.SYSTEM_UID,
                                 userId);
                     }
@@ -6705,7 +6701,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setProcessLimit(int max) {
-        enforceCallingPermission(Manifest.permission.SET_PROCESS_LIMIT,
+        enforceCallingPermission(android.Manifest.permission.SET_PROCESS_LIMIT,
                 "setProcessLimit()");
         synchronized (this) {
             mProcessLimit = max < 0 ? ProcessList.MAX_CACHED_APPS : max;
@@ -6743,7 +6739,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setProcessForeground(IBinder token, int pid, boolean isForeground) {
-        enforceCallingPermission(Manifest.permission.SET_PROCESS_LIMIT,
+        enforceCallingPermission(android.Manifest.permission.SET_PROCESS_LIMIT,
                 "setProcessForeground()");
         synchronized(this) {
             boolean changed = false;
@@ -8105,10 +8101,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     private boolean isGetTasksAllowed(String caller, int callingPid, int callingUid) {
-        boolean allowed = checkPermission(Manifest.permission.REAL_GET_TASKS,
+        boolean allowed = checkPermission(android.Manifest.permission.REAL_GET_TASKS,
                 callingPid, callingUid) == PackageManager.PERMISSION_GRANTED;
         if (!allowed) {
-            if (checkPermission(Manifest.permission.GET_TASKS,
+            if (checkPermission(android.Manifest.permission.GET_TASKS,
                     callingPid, callingUid) == PackageManager.PERMISSION_GRANTED) {
                 // Temporary compatibility: some existing apps on the system image may
                 // still be requesting the old permission and not switched to the new
@@ -8143,7 +8139,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             final boolean allowed = isGetTasksAllowed("getRecentTasks", Binder.getCallingPid(),
                     callingUid);
             final boolean detailed = checkCallingPermission(
-                    Manifest.permission.GET_DETAILED_TASKS)
+                    android.Manifest.permission.GET_DETAILED_TASKS)
                     == PackageManager.PERMISSION_GRANTED;
 
             final int N = mRecentTasks.size();
@@ -8231,7 +8227,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     @Override
     public ActivityManager.TaskThumbnail getTaskThumbnail(int id) {
         synchronized (this) {
-            enforceCallingPermission(Manifest.permission.READ_FRAME_BUFFER,
+            enforceCallingPermission(android.Manifest.permission.READ_FRAME_BUFFER,
                     "getTaskThumbnail()");
             TaskRecord tr = mStackSupervisor.anyTaskForIdLocked(id);
             if (tr != null) {
@@ -8494,7 +8490,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     @Override
     public boolean removeTask(int taskId) {
         synchronized (this) {
-            enforceCallingPermission(Manifest.permission.REMOVE_TASKS,
+            enforceCallingPermission(android.Manifest.permission.REMOVE_TASKS,
                     "removeTask()");
             long ident = Binder.clearCallingIdentity();
             try {
@@ -8510,7 +8506,7 @@ public final class ActivityManagerService extends ActivityManagerNative
      */
     @Override
     public void moveTaskToFront(int taskId, int flags, Bundle options) {
-        enforceCallingPermission(Manifest.permission.REORDER_TASKS,
+        enforceCallingPermission(android.Manifest.permission.REORDER_TASKS,
                 "moveTaskToFront()");
 
         if (DEBUG_STACK) Slog.d(TAG, "moveTaskToFront: moving taskId=" + taskId);
@@ -8550,7 +8546,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void moveTaskToBack(int taskId) {
-        enforceCallingPermission(Manifest.permission.REORDER_TASKS,
+        enforceCallingPermission(android.Manifest.permission.REORDER_TASKS,
                 "moveTaskToBack()");
 
         synchronized(this) {
@@ -8611,7 +8607,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void moveTaskBackwards(int task) {
-        enforceCallingPermission(Manifest.permission.REORDER_TASKS,
+        enforceCallingPermission(android.Manifest.permission.REORDER_TASKS,
                 "moveTaskBackwards()");
 
         synchronized(this) {
@@ -8631,7 +8627,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public IBinder getHomeActivityToken() throws RemoteException {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "getHomeActivityToken()");
         synchronized (this) {
             return mStackSupervisor.getHomeActivityToken();
@@ -8641,7 +8637,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     @Override
     public IActivityContainer createActivityContainer(IBinder parentActivityToken,
             IActivityContainerCallback callback) throws RemoteException {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "createActivityContainer()");
         synchronized (this) {
             if (parentActivityToken == null) {
@@ -8660,7 +8656,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void deleteActivityContainer(IActivityContainer container) throws RemoteException {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "deleteActivityContainer()");
         synchronized (this) {
             mStackSupervisor.deleteActivityContainer(container);
@@ -8680,7 +8676,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void moveTaskToStack(int taskId, int stackId, boolean toTop) {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "moveTaskToStack()");
         if (stackId == HOME_STACK_ID) {
             Slog.e(TAG, "moveTaskToStack: Attempt to move task " + taskId + " to home stack",
@@ -8700,7 +8696,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void resizeStack(int stackBoxId, Rect bounds) {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "resizeStackBox()");
         long ident = Binder.clearCallingIdentity();
         try {
@@ -8712,7 +8708,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public List<StackInfo> getAllStackInfos() {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "getAllStackInfos()");
         long ident = Binder.clearCallingIdentity();
         try {
@@ -8726,7 +8722,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public StackInfo getStackInfo(int stackId) {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "getStackInfo()");
         long ident = Binder.clearCallingIdentity();
         try {
@@ -8740,7 +8736,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public boolean isInHomeStack(int taskId) {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "getStackInfo()");
         long ident = Binder.clearCallingIdentity();
         try {
@@ -8844,7 +8840,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void startLockTaskModeOnCurrent() throws RemoteException {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "startLockTaskModeOnCurrent");
         long ident = Binder.clearCallingIdentity();
         try {
@@ -8892,7 +8888,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void stopLockTaskModeOnCurrent() throws RemoteException {
-        enforceCallingPermission(Manifest.permission.MANAGE_ACTIVITY_STACKS,
+        enforceCallingPermission(android.Manifest.permission.MANAGE_ACTIVITY_STACKS,
                 "stopLockTaskModeOnCurrent");
         long ident = Binder.clearCallingIdentity();
         try {
@@ -9513,7 +9509,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     public ContentProviderHolder getContentProviderExternal(
             String name, int userId, IBinder token) {
-        enforceCallingPermission(Manifest.permission.ACCESS_CONTENT_PROVIDERS_EXTERNALLY,
+        enforceCallingPermission(android.Manifest.permission.ACCESS_CONTENT_PROVIDERS_EXTERNALLY,
             "Do not have permission in call getContentProviderExternal()");
         userId = handleIncomingUser(Binder.getCallingPid(), Binder.getCallingUid(), userId,
                 false, ALLOW_FULL_ONLY, "getContentProvider", null);
@@ -9555,7 +9551,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void removeContentProviderExternal(String name, IBinder token) {
-        enforceCallingPermission(Manifest.permission.ACCESS_CONTENT_PROVIDERS_EXTERNALLY,
+        enforceCallingPermission(android.Manifest.permission.ACCESS_CONTENT_PROVIDERS_EXTERNALLY,
             "Do not have permission in call removeContentProviderExternal()");
         int userId = UserHandle.getCallingUserId();
         long ident = Binder.clearCallingIdentity();
@@ -9757,7 +9753,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     @Override
     public void appNotRespondingViaProvider(IBinder connection) {
         enforceCallingPermission(
-                Manifest.permission.REMOVE_TASKS, "appNotRespondingViaProvider()");
+                android.Manifest.permission.REMOVE_TASKS, "appNotRespondingViaProvider()");
 
         final ContentProviderConnection conn = (ContentProviderConnection) connection;
         if (conn == null) {
@@ -9949,7 +9945,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void unhandledBack() {
-        enforceCallingPermission(Manifest.permission.FORCE_BACK,
+        enforceCallingPermission(android.Manifest.permission.FORCE_BACK,
                 "unhandledBack()");
 
         synchronized(this) {
@@ -10076,10 +10072,10 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public boolean shutdown(int timeout) {
-        if (checkCallingPermission(Manifest.permission.SHUTDOWN)
+        if (checkCallingPermission(android.Manifest.permission.SHUTDOWN)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.SHUTDOWN);
+                    + android.Manifest.permission.SHUTDOWN);
         }
 
         boolean timedout = false;
@@ -10146,10 +10142,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void setLockScreenShown(boolean shown) {
-        if (checkCallingPermission(Manifest.permission.DEVICE_POWER)
+        if (checkCallingPermission(android.Manifest.permission.DEVICE_POWER)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.DEVICE_POWER);
+                    + android.Manifest.permission.DEVICE_POWER);
         }
 
         synchronized(this) {
@@ -10166,10 +10162,10 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void stopAppSwitches() {
-        if (checkCallingPermission(Manifest.permission.STOP_APP_SWITCHES)
+        if (checkCallingPermission(android.Manifest.permission.STOP_APP_SWITCHES)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.STOP_APP_SWITCHES);
+                    + android.Manifest.permission.STOP_APP_SWITCHES);
         }
         
         synchronized(this) {
@@ -10183,10 +10179,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
     
     public void resumeAppSwitches() {
-        if (checkCallingPermission(Manifest.permission.STOP_APP_SWITCHES)
+        if (checkCallingPermission(android.Manifest.permission.STOP_APP_SWITCHES)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.STOP_APP_SWITCHES);
+                    + android.Manifest.permission.STOP_APP_SWITCHES);
         }
         
         synchronized(this) {
@@ -10204,7 +10200,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         }
 
         int perm = checkComponentPermission(
-                Manifest.permission.STOP_APP_SWITCHES, sourcePid,
+                android.Manifest.permission.STOP_APP_SWITCHES, sourcePid,
                 sourceUid, -1, true);
         if (perm == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -10214,7 +10210,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         // also see if they are allowed to control app switches.
         if (callingUid != -1 && callingUid != sourceUid) {
             perm = checkComponentPermission(
-                    Manifest.permission.STOP_APP_SWITCHES, callingPid,
+                    android.Manifest.permission.STOP_APP_SWITCHES, callingPid,
                     callingUid, -1, true);
             if (perm == PackageManager.PERMISSION_GRANTED) {
                 return true;
@@ -10227,7 +10223,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     
     public void setDebugApp(String packageName, boolean waitForDebugger,
             boolean persistent) {
-        enforceCallingPermission(Manifest.permission.SET_DEBUG_APP,
+        enforceCallingPermission(android.Manifest.permission.SET_DEBUG_APP,
                 "setDebugApp()");
 
         long ident = Binder.clearCallingIdentity();
@@ -10302,7 +10298,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setAlwaysFinish(boolean enabled) {
-        enforceCallingPermission(Manifest.permission.SET_ALWAYS_FINISH,
+        enforceCallingPermission(android.Manifest.permission.SET_ALWAYS_FINISH,
                 "setAlwaysFinish()");
 
         Settings.Global.putInt(
@@ -10316,7 +10312,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void setActivityController(IActivityController controller) {
-        enforceCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER,
+        enforceCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER,
                 "setActivityController()");
         synchronized (this) {
             mController = controller;
@@ -10351,7 +10347,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void requestBugReport() {
-        enforceCallingPermission(Manifest.permission.DUMP, "requestBugReport");
+        enforceCallingPermission(android.Manifest.permission.DUMP, "requestBugReport");
         SystemProperties.set("ctl.start", "bugreport");
     }
 
@@ -10368,10 +10364,10 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public long inputDispatchingTimedOut(int pid, final boolean aboveSystem, String reason) {
-        if (checkCallingPermission(Manifest.permission.FILTER_EVENTS)
+        if (checkCallingPermission(android.Manifest.permission.FILTER_EVENTS)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.FILTER_EVENTS);
+                    + android.Manifest.permission.FILTER_EVENTS);
         }
         ProcessRecord proc;
         long timeout;
@@ -10396,10 +10392,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     public boolean inputDispatchingTimedOut(final ProcessRecord proc,
             final ActivityRecord activity, final ActivityRecord parent,
             final boolean aboveSystem, String reason) {
-        if (checkCallingPermission(Manifest.permission.FILTER_EVENTS)
+        if (checkCallingPermission(android.Manifest.permission.FILTER_EVENTS)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.FILTER_EVENTS);
+                    + android.Manifest.permission.FILTER_EVENTS);
         }
 
         final String annotation;
@@ -10466,7 +10462,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     private PendingAssistExtras enqueueAssistContext(int requestType, Intent intent, String hint,
             int userHandle) {
-        enforceCallingPermission(Manifest.permission.GET_TOP_ACTIVITY_INFO,
+        enforceCallingPermission(android.Manifest.permission.GET_TOP_ACTIVITY_INFO,
                 "getAssistContextExtras()");
         PendingAssistExtras pae;
         Bundle extras = new Bundle();
@@ -10540,7 +10536,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void registerProcessObserver(IProcessObserver observer) {
-        enforceCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER,
+        enforceCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER,
                 "registerProcessObserver()");
         synchronized (this) {
             mProcessObservers.register(observer);
@@ -10850,13 +10846,13 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void hang(final IBinder who, boolean allowRestart) {
-        if (checkCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER)
+        if (checkCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.SET_ACTIVITY_WATCHER);
+                    + android.Manifest.permission.SET_ACTIVITY_WATCHER);
         }
 
-        final DeathRecipient death = new DeathRecipient() {
+        final IBinder.DeathRecipient death = new DeathRecipient() {
             @Override
             public void binderDied() {
                 synchronized (this) {
@@ -10889,10 +10885,10 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void restart() {
-        if (checkCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER)
+        if (checkCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.SET_ACTIVITY_WATCHER);
+                    + android.Manifest.permission.SET_ACTIVITY_WATCHER);
         }
 
         Log.i(TAG, "Sending shutdown broadcast...");
@@ -10925,10 +10921,10 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     public void performIdleMaintenance() {
-        if (checkCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER)
+        if (checkCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires permission "
-                    + Manifest.permission.SET_ACTIVITY_WATCHER);
+                    + android.Manifest.permission.SET_ACTIVITY_WATCHER);
         }
 
         synchronized (this) {
@@ -11051,9 +11047,9 @@ public final class ActivityManagerService extends ActivityManagerNative
                 String vers = dis.readUTF();
                 String codename = dis.readUTF();
                 String build = dis.readUTF();
-                if (Build.VERSION.RELEASE.equals(vers)
-                        && Build.VERSION.CODENAME.equals(codename)
-                        && Build.VERSION.INCREMENTAL.equals(build)) {
+                if (android.os.Build.VERSION.RELEASE.equals(vers)
+                        && android.os.Build.VERSION.CODENAME.equals(codename)
+                        && android.os.Build.VERSION.INCREMENTAL.equals(build)) {
                     int num = dis.readInt();
                     while (num > 0) {
                         num--;
@@ -11085,9 +11081,9 @@ public final class ActivityManagerService extends ActivityManagerNative
             fos = new FileOutputStream(file);
             dos = new DataOutputStream(new BufferedOutputStream(fos, 2048));
             dos.writeInt(LAST_PREBOOT_DELIVERED_FILE_VERSION);
-            dos.writeUTF(Build.VERSION.RELEASE);
-            dos.writeUTF(Build.VERSION.CODENAME);
-            dos.writeUTF(Build.VERSION.INCREMENTAL);
+            dos.writeUTF(android.os.Build.VERSION.RELEASE);
+            dos.writeUTF(android.os.Build.VERSION.CODENAME);
+            dos.writeUTF(android.os.Build.VERSION.INCREMENTAL);
             dos.writeInt(list.size());
             for (int i=0; i<list.size(); i++) {
                 dos.writeUTF(list.get(i).getPackageName());
@@ -12328,13 +12324,13 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     @Override
     protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
-        if (checkCallingPermission(Manifest.permission.DUMP)
+        if (checkCallingPermission(android.Manifest.permission.DUMP)
                 != PackageManager.PERMISSION_GRANTED) {
             pw.println("Permission Denial: can't dump ActivityManager from from pid="
                     + Binder.getCallingPid()
                     + ", uid=" + Binder.getCallingUid()
                     + " without permission "
-                    + Manifest.permission.DUMP);
+                    + android.Manifest.permission.DUMP);
             return;
         }
 
@@ -15925,14 +15921,14 @@ public final class ActivityManagerService extends ActivityManagerNative
                     // manager about a package being removed, we need to remove all of
                     // its activities from the history stack.
                     if (checkComponentPermission(
-                            Manifest.permission.BROADCAST_PACKAGE_REMOVED,
+                            android.Manifest.permission.BROADCAST_PACKAGE_REMOVED,
                             callingPid, callingUid, -1, true)
                             != PackageManager.PERMISSION_GRANTED) {
                         String msg = "Permission Denial: " + intent.getAction()
                                 + " broadcast from " + callerPackage + " (pid=" + callingPid
                                 + ", uid=" + callingUid + ")"
                                 + " requires "
-                                + Manifest.permission.BROADCAST_PACKAGE_REMOVED;
+                                + android.Manifest.permission.BROADCAST_PACKAGE_REMOVED;
                         Slog.w(TAG, msg);
                         throw new SecurityException(msg);
                     }
@@ -16053,12 +16049,12 @@ public final class ActivityManagerService extends ActivityManagerNative
 
         // Add to the sticky list if requested.
         if (sticky) {
-            if (checkPermission(Manifest.permission.BROADCAST_STICKY,
+            if (checkPermission(android.Manifest.permission.BROADCAST_STICKY,
                     callingPid, callingUid)
                     != PackageManager.PERMISSION_GRANTED) {
                 String msg = "Permission Denial: broadcastIntent() requesting a sticky broadcast from pid="
                         + callingPid + ", uid=" + callingUid
-                        + " requires " + Manifest.permission.BROADCAST_STICKY;
+                        + " requires " + android.Manifest.permission.BROADCAST_STICKY;
                 Slog.w(TAG, msg);
                 throw new SecurityException(msg);
             }
@@ -16359,12 +16355,12 @@ public final class ActivityManagerService extends ActivityManagerNative
                 userId, true, ALLOW_NON_FULL, "removeStickyBroadcast", null);
 
         synchronized(this) {
-            if (checkCallingPermission(Manifest.permission.BROADCAST_STICKY)
+            if (checkCallingPermission(android.Manifest.permission.BROADCAST_STICKY)
                     != PackageManager.PERMISSION_GRANTED) {
                 String msg = "Permission Denial: unbroadcastIntent() from pid="
                         + Binder.getCallingPid()
                         + ", uid=" + Binder.getCallingUid()
-                        + " requires " + Manifest.permission.BROADCAST_STICKY;
+                        + " requires " + android.Manifest.permission.BROADCAST_STICKY;
                 Slog.w(TAG, msg);
                 throw new SecurityException(msg);
             }
@@ -16463,7 +16459,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                     className, STOCK_PM_FLAGS);
                 ai = AppGlobals.getPackageManager().getApplicationInfo(
                         ii.targetPackage, STOCK_PM_FLAGS, userId);
-            } catch (NameNotFoundException e) {
+            } catch (PackageManager.NameNotFoundException e) {
             } catch (RemoteException e) {
             }
             if (ii == null) {
@@ -16622,9 +16618,9 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void updatePersistentConfiguration(Configuration values) {
-        enforceCallingPermission(Manifest.permission.CHANGE_CONFIGURATION,
+        enforceCallingPermission(android.Manifest.permission.CHANGE_CONFIGURATION,
                 "updateConfiguration()");
-        enforceCallingPermission(Manifest.permission.WRITE_SETTINGS,
+        enforceCallingPermission(android.Manifest.permission.WRITE_SETTINGS,
                 "updateConfiguration()");
         if (values == null) {
             throw new NullPointerException("Configuration must not be null");
@@ -16638,7 +16634,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     public void updateConfiguration(Configuration values) {
-        enforceCallingPermission(Manifest.permission.CHANGE_CONFIGURATION,
+        enforceCallingPermission(android.Manifest.permission.CHANGE_CONFIGURATION,
                 "updateConfiguration()");
 
         synchronized(this) {
@@ -18578,10 +18574,10 @@ public final class ActivityManagerService extends ActivityManagerNative
         }
 
         synchronized (this) {
-            if (checkCallingPermission(Manifest.permission.SIGNAL_PERSISTENT_PROCESSES)
+            if (checkCallingPermission(android.Manifest.permission.SIGNAL_PERSISTENT_PROCESSES)
                     != PackageManager.PERMISSION_GRANTED) {
                 throw new SecurityException("Requires permission "
-                        + Manifest.permission.SIGNAL_PERSISTENT_PROCESSES);
+                        + android.Manifest.permission.SIGNAL_PERSISTENT_PROCESSES);
             }
 
             for (int i = mLruProcesses.size() - 1 ; i >= 0 ; i--) {
@@ -18631,10 +18627,10 @@ public final class ActivityManagerService extends ActivityManagerNative
             synchronized (this) {
                 // note: hijacking SET_ACTIVITY_WATCHER, but should be changed to
                 // its own permission.
-                if (checkCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER)
+                if (checkCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER)
                         != PackageManager.PERMISSION_GRANTED) {
                     throw new SecurityException("Requires permission "
-                            + Manifest.permission.SET_ACTIVITY_WATCHER);
+                            + android.Manifest.permission.SET_ACTIVITY_WATCHER);
                 }
 
                 if (start && (profilerInfo == null || profilerInfo.profileFd == null)) {
@@ -18729,10 +18725,10 @@ public final class ActivityManagerService extends ActivityManagerNative
             synchronized (this) {
                 // note: hijacking SET_ACTIVITY_WATCHER, but should be changed to
                 // its own permission (same as profileControl).
-                if (checkCallingPermission(Manifest.permission.SET_ACTIVITY_WATCHER)
+                if (checkCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER)
                         != PackageManager.PERMISSION_GRANTED) {
                     throw new SecurityException("Requires permission "
-                            + Manifest.permission.SET_ACTIVITY_WATCHER);
+                            + android.Manifest.permission.SET_ACTIVITY_WATCHER);
                 }
 
                 if (fd == null) {
@@ -19075,7 +19071,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                 intent.putExtra(Intent.EXTRA_USER_HANDLE, newUserId);
                 broadcastIntentLocked(null, null, intent,
                         null, null, 0, null, null,
-                        Manifest.permission.MANAGE_USERS, AppOpsManager.OP_NONE,
+                        android.Manifest.permission.MANAGE_USERS, AppOpsManager.OP_NONE,
                         false, false, MY_PID, Process.SYSTEM_UID, UserHandle.USER_ALL);
             }
         } finally {
@@ -19252,7 +19248,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                 intent.addFlags(Intent.FLAG_RECEIVER_NO_ABORT);
                 broadcastIntentLocked(null, null, intent,
                         null, null, 0, null, null,
-                        Manifest.permission.RECEIVE_BOOT_COMPLETED, AppOpsManager.OP_NONE,
+                        android.Manifest.permission.RECEIVE_BOOT_COMPLETED, AppOpsManager.OP_NONE,
                         true, false, MY_PID, Process.SYSTEM_UID, userId);
             }
         }
@@ -19613,7 +19609,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     /**
      * An implementation of IAppTask, that allows an app to manage its own tasks via
-     * {@link ActivityManager.AppTask}.  We keep track of the callingUid to ensure that
+     * {@link android.app.ActivityManager.AppTask}.  We keep track of the callingUid to ensure that
      * only the process that calls getAppTasks() can call the AppTask methods.
      */
     class AppTaskImpl extends IAppTask.Stub {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openxu.bs.androidsuorce;
+package com.android.server.am;
 
 import static android.view.WindowManager.LayoutParams.*;
 
@@ -445,7 +445,7 @@ public class WindowManagerService extends IWindowManager.Stub
     /**
      * Stores for each user whether screencapture is disabled
      * This array is essentially a cache for all userId for
-     * {@link DevicePolicyManager#getScreenCaptureDisabled}
+     * {@link android.app.admin.DevicePolicyManager#getScreenCaptureDisabled}
      */
     SparseArray<Boolean> mScreenCaptureDisabled = new SparseArray<Boolean>();
 
@@ -2112,7 +2112,7 @@ public class WindowManagerService extends IWindowManager.Stub
         }
 
         if (rawChanged && (wallpaperWin.mAttrs.privateFlags &
-                    LayoutParams.PRIVATE_FLAG_WANTS_OFFSET_NOTIFICATIONS) != 0) {
+                    WindowManager.LayoutParams.PRIVATE_FLAG_WANTS_OFFSET_NOTIFICATIONS) != 0) {
             try {
                 if (DEBUG_WALLPAPER) Slog.v(TAG, "Report new wp offset "
                         + wallpaperWin + " x=" + wallpaperWin.mWallpaperX
@@ -2269,7 +2269,7 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     public int addWindow(Session session, IWindow client, int seq,
-            LayoutParams attrs, int viewVisibility, int displayId,
+            WindowManager.LayoutParams attrs, int viewVisibility, int displayId,
             Rect outContentInsets, Rect outStableInsets, InputChannel outInputChannel) {
         int[] appOp = new int[1];
         int res = mPolicy.checkAddPermission(attrs, appOp);
@@ -2440,7 +2440,7 @@ public class WindowManagerService extends IWindowManager.Stub
             }
 
             if (outInputChannel != null && (attrs.inputFeatures
-                    & LayoutParams.INPUT_FEATURE_NO_INPUT_CHANNEL) == 0) {
+                    & WindowManager.LayoutParams.INPUT_FEATURE_NO_INPUT_CHANNEL) == 0) {
                 String name = win.makeInputChannelName();
                 InputChannel[] inputChannels = InputChannel.openInputChannelPair(name);
                 win.setInputChannel(inputChannels[0]);
@@ -2993,7 +2993,7 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     public int relayoutWindow(Session session, IWindow client, int seq,
-            LayoutParams attrs, int requestedWidth,
+            WindowManager.LayoutParams attrs, int requestedWidth,
             int requestedHeight, int viewVisibility, int flags,
             Rect outFrame, Rect outOverscanInsets, Rect outContentInsets,
             Rect outVisibleInsets, Rect outStableInsets, Configuration outConfig,
@@ -3004,7 +3004,7 @@ public class WindowManagerService extends IWindowManager.Stub
         boolean surfaceChanged = false;
         boolean animating;
         boolean hasStatusBarPermission =
-                mContext.checkCallingOrSelfPermission(Manifest.permission.STATUS_BAR)
+                mContext.checkCallingOrSelfPermission(android.Manifest.permission.STATUS_BAR)
                         == PackageManager.PERMISSION_GRANTED;
 
         long origId = Binder.clearCallingIdentity();
@@ -3053,8 +3053,8 @@ public class WindowManagerService extends IWindowManager.Stub
                 }
                 flagChanges = win.mAttrs.flags ^= attrs.flags;
                 attrChanges = win.mAttrs.copyFrom(attrs);
-                if ((attrChanges & (LayoutParams.LAYOUT_CHANGED
-                        | LayoutParams.SYSTEM_UI_VISIBILITY_CHANGED)) != 0) {
+                if ((attrChanges & (WindowManager.LayoutParams.LAYOUT_CHANGED
+                        | WindowManager.LayoutParams.SYSTEM_UI_VISIBILITY_CHANGED)) != 0) {
                     win.mLayoutNeeded = true;
                 }
             }
@@ -3065,12 +3065,12 @@ public class WindowManagerService extends IWindowManager.Stub
             win.mEnforceSizeCompat =
                     (win.mAttrs.privateFlags & PRIVATE_FLAG_COMPATIBLE_WINDOW) != 0;
 
-            if ((attrChanges & LayoutParams.ALPHA_CHANGED) != 0) {
+            if ((attrChanges & WindowManager.LayoutParams.ALPHA_CHANGED) != 0) {
                 winAnimator.mAlpha = attrs.alpha;
             }
 
             final boolean scaledWindow =
-                ((win.mAttrs.flags & LayoutParams.FLAG_SCALED) != 0);
+                ((win.mAttrs.flags & WindowManager.LayoutParams.FLAG_SCALED) != 0);
 
             if (scaledWindow) {
                 // requested{Width|Height} Surface's physical size
@@ -3123,7 +3123,7 @@ public class WindowManagerService extends IWindowManager.Stub
                         winAnimator.applyEnterAnimationLocked();
                     }
                     if ((win.mAttrs.flags
-                            & LayoutParams.FLAG_TURN_SCREEN_ON) != 0) {
+                            & WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON) != 0) {
                         if (DEBUG_VISIBILITY) Slog.v(TAG,
                                 "Relayout window turning screen on: " + win);
                         win.mTurnOnScreen = true;
@@ -3134,7 +3134,7 @@ public class WindowManagerService extends IWindowManager.Stub
                         outConfig.setTo(mCurConfiguration);
                     }
                 }
-                if ((attrChanges& LayoutParams.FORMAT_CHANGED) != 0) {
+                if ((attrChanges&WindowManager.LayoutParams.FORMAT_CHANGED) != 0) {
                     // To change the format, we need to re-build the surface.
                     winAnimator.destroySurfaceLocked();
                     toBeDisplayed = true;
@@ -3178,10 +3178,10 @@ public class WindowManagerService extends IWindowManager.Stub
                     // window of the app: propagate lock screen flags to it,
                     // to provide the correct semantics while starting.
                     final int mask =
-                        LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | LayoutParams.FLAG_DISMISS_KEYGUARD
-                        | LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON;
-                    LayoutParams sa = win.mAppToken.startingWindow.mAttrs;
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                        | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON;
+                    WindowManager.LayoutParams sa = win.mAppToken.startingWindow.mAttrs;
                     sa.flags = (sa.flags&~mask) | (win.mAttrs.flags&mask);
                 }
             } else {
@@ -3368,7 +3368,7 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     private boolean applyAnimationLocked(AppWindowToken atoken,
-            LayoutParams lp, int transit, boolean enter, boolean isVoiceInteraction) {
+            WindowManager.LayoutParams lp, int transit, boolean enter, boolean isVoiceInteraction) {
         // Only apply an animation if the display isn't frozen.  If it is
         // frozen, there is no reason to animate and it can cause strange
         // artifacts when we unfreeze the display if some different animation
@@ -3525,7 +3525,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void addWindowToken(IBinder token, int type) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "addWindowToken()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -3546,7 +3546,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void removeWindowToken(IBinder token) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "removeWindowToken()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -3627,7 +3627,7 @@ public class WindowManagerService extends IWindowManager.Stub
     public void addAppToken(int addPos, IApplicationToken token, int taskId, int stackId,
             int requestedOrientation, boolean fullscreen, boolean showWhenLocked, int userId,
             int configChanges, boolean voiceInteraction, boolean launchTaskBehind) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "addAppToken()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -3683,7 +3683,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setAppGroupId(IBinder token, int groupId) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppGroupId()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -3822,7 +3822,7 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public Configuration updateOrientationFromAppTokens(
             Configuration currentConfig, IBinder freezeThisOneIfNeeded) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "updateOrientationFromAppTokens()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -3920,7 +3920,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setNewConfiguration(Configuration config) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setNewConfiguration()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -3937,7 +3937,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setAppOrientation(IApplicationToken token, int requestedOrientation) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppOrientation()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4014,7 +4014,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setFocusedApp(IBinder token, boolean moveFocusNow) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setFocusedApp()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4049,7 +4049,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void prepareAppTransition(int transit, boolean alwaysKeepCurrent) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "prepareAppTransition()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4136,7 +4136,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void executeAppTransition() {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "executeAppTransition()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4161,7 +4161,7 @@ public class WindowManagerService extends IWindowManager.Stub
             int theme, CompatibilityInfo compatInfo,
             CharSequence nonLocalizedLabel, int labelRes, int icon, int logo,
             int windowFlags, IBinder transferFrom, boolean createIfNeeded) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppStartingWindow()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4381,7 +4381,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setAppWillBeHidden(IBinder token) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppWillBeHidden()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4425,7 +4425,7 @@ public class WindowManagerService extends IWindowManager.Stub
         }
     }
 
-    boolean setTokenVisibilityLocked(AppWindowToken wtoken, LayoutParams lp,
+    boolean setTokenVisibilityLocked(AppWindowToken wtoken, WindowManager.LayoutParams lp,
             boolean visible, int transit, boolean performLayout, boolean isVoiceInteraction) {
         boolean delayed = false;
 
@@ -4557,7 +4557,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setAppVisibility(IBinder token, boolean visible) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppVisibility()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4724,7 +4724,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void startAppFreezingScreen(IBinder token, int configChanges) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppFreezingScreen()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4748,7 +4748,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void stopAppFreezingScreen(IBinder token, boolean force) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setAppFreezingScreen()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -4779,7 +4779,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void removeAppToken(IBinder token) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "removeAppToken()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -5274,7 +5274,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void startFreezingScreen(int exitAnim, int enterAnim) {
-        if (!checkCallingPermission(Manifest.permission.FREEZE_SCREEN,
+        if (!checkCallingPermission(android.Manifest.permission.FREEZE_SCREEN,
                 "startFreezingScreen()")) {
             throw new SecurityException("Requires FREEZE_SCREEN permission");
         }
@@ -5296,7 +5296,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void stopFreezingScreen() {
-        if (!checkCallingPermission(Manifest.permission.FREEZE_SCREEN,
+        if (!checkCallingPermission(android.Manifest.permission.FREEZE_SCREEN,
                 "stopFreezingScreen()")) {
             throw new SecurityException("Requires FREEZE_SCREEN permission");
         }
@@ -5317,7 +5317,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void disableKeyguard(IBinder token, String tag) {
-        if (mContext.checkCallingOrSelfPermission(Manifest.permission.DISABLE_KEYGUARD)
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DISABLE_KEYGUARD)
             != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires DISABLE_KEYGUARD permission");
         }
@@ -5332,7 +5332,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void reenableKeyguard(IBinder token) {
-        if (mContext.checkCallingOrSelfPermission(Manifest.permission.DISABLE_KEYGUARD)
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DISABLE_KEYGUARD)
             != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires DISABLE_KEYGUARD permission");
         }
@@ -5350,7 +5350,7 @@ public class WindowManagerService extends IWindowManager.Stub
      */
     @Override
     public void exitKeyguardSecurely(final IOnKeyguardExitResult callback) {
-        if (mContext.checkCallingOrSelfPermission(Manifest.permission.DISABLE_KEYGUARD)
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DISABLE_KEYGUARD)
             != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires DISABLE_KEYGUARD permission");
         }
@@ -5393,7 +5393,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void dismissKeyguard() {
-        if (mContext.checkCallingOrSelfPermission(Manifest.permission.DISABLE_KEYGUARD)
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DISABLE_KEYGUARD)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires DISABLE_KEYGUARD permission");
         }
@@ -5405,7 +5405,7 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void keyguardGoingAway(boolean disableWindowAnimations,
             boolean keyguardGoingToNotificationShade) {
-        if (mContext.checkCallingOrSelfPermission(Manifest.permission.DISABLE_KEYGUARD)
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DISABLE_KEYGUARD)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Requires DISABLE_KEYGUARD permission");
         }
@@ -5469,7 +5469,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setAnimationScale(int which, float scale) {
-        if (!checkCallingPermission(Manifest.permission.SET_ANIMATION_SCALE,
+        if (!checkCallingPermission(android.Manifest.permission.SET_ANIMATION_SCALE,
                 "setAnimationScale()")) {
             throw new SecurityException("Requires SET_ANIMATION_SCALE permission");
         }
@@ -5487,7 +5487,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setAnimationScales(float[] scales) {
-        if (!checkCallingPermission(Manifest.permission.SET_ANIMATION_SCALE,
+        if (!checkCallingPermission(android.Manifest.permission.SET_ANIMATION_SCALE,
                 "setAnimationScale()")) {
             throw new SecurityException("Requires SET_ANIMATION_SCALE permission");
         }
@@ -5931,7 +5931,7 @@ public class WindowManagerService extends IWindowManager.Stub
                                 getDefaultDisplayContentLocked().getDisplay(),
                                 mFxSession,
                                 mPolicy.windowTypeToLayerLw(
-                                        LayoutParams.TYPE_POINTER)
+                                        WindowManager.LayoutParams.TYPE_POINTER)
                                         * TYPE_LAYER_MULTIPLIER + 10, screenOffset);
                     }
                     mCircularDisplayMask.setVisibility(true);
@@ -5960,7 +5960,7 @@ public class WindowManagerService extends IWindowManager.Stub
                             getDefaultDisplayContentLocked().getDisplay(),
                             mFxSession,
                             mPolicy.windowTypeToLayerLw(
-                                    LayoutParams.TYPE_POINTER)
+                                    WindowManager.LayoutParams.TYPE_POINTER)
                                     * TYPE_LAYER_MULTIPLIER + 10);
                 }
                 mEmulatorDisplayOverlay.setVisibility(true);
@@ -6315,7 +6315,7 @@ public class WindowManagerService extends IWindowManager.Stub
      */
     @Override
     public void freezeRotation(int rotation) {
-        if (!checkCallingPermission(Manifest.permission.SET_ORIENTATION,
+        if (!checkCallingPermission(android.Manifest.permission.SET_ORIENTATION,
                 "freezeRotation()")) {
             throw new SecurityException("Requires SET_ORIENTATION permission");
         }
@@ -6343,7 +6343,7 @@ public class WindowManagerService extends IWindowManager.Stub
      */
     @Override
     public void thawRotation() {
-        if (!checkCallingPermission(Manifest.permission.SET_ORIENTATION,
+        if (!checkCallingPermission(android.Manifest.permission.SET_ORIENTATION,
                 "thawRotation()")) {
             throw new SecurityException("Requires SET_ORIENTATION permission");
         }
@@ -7427,7 +7427,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void pauseKeyDispatching(IBinder _token) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "pauseKeyDispatching()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -7442,7 +7442,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void resumeKeyDispatching(IBinder _token) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "resumeKeyDispatching()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -7457,7 +7457,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void setEventDispatching(boolean enabled) {
-        if (!checkCallingPermission(Manifest.permission.MANAGE_APP_TOKENS,
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,
                 "setEventDispatching()")) {
             throw new SecurityException("Requires MANAGE_APP_TOKENS permission");
         }
@@ -8244,10 +8244,10 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void setForcedDisplaySize(int displayId, int width, int height) {
         if (mContext.checkCallingOrSelfPermission(
-                Manifest.permission.WRITE_SECURE_SETTINGS) !=
+                android.Manifest.permission.WRITE_SECURE_SETTINGS) !=
                 PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Must hold permission " +
-                    Manifest.permission.WRITE_SECURE_SETTINGS);
+                    android.Manifest.permission.WRITE_SECURE_SETTINGS);
         }
         if (displayId != Display.DEFAULT_DISPLAY) {
             throw new IllegalArgumentException("Can only set the default display");
@@ -8335,10 +8335,10 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void clearForcedDisplaySize(int displayId) {
         if (mContext.checkCallingOrSelfPermission(
-                Manifest.permission.WRITE_SECURE_SETTINGS) !=
+                android.Manifest.permission.WRITE_SECURE_SETTINGS) !=
                 PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Must hold permission " +
-                    Manifest.permission.WRITE_SECURE_SETTINGS);
+                    android.Manifest.permission.WRITE_SECURE_SETTINGS);
         }
         if (displayId != Display.DEFAULT_DISPLAY) {
             throw new IllegalArgumentException("Can only set the default display");
@@ -8388,10 +8388,10 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void setForcedDisplayDensity(int displayId, int density) {
         if (mContext.checkCallingOrSelfPermission(
-                Manifest.permission.WRITE_SECURE_SETTINGS) !=
+                android.Manifest.permission.WRITE_SECURE_SETTINGS) !=
                 PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Must hold permission " +
-                    Manifest.permission.WRITE_SECURE_SETTINGS);
+                    android.Manifest.permission.WRITE_SECURE_SETTINGS);
         }
         if (displayId != Display.DEFAULT_DISPLAY) {
             throw new IllegalArgumentException("Can only set the default display");
@@ -8424,10 +8424,10 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void clearForcedDisplayDensity(int displayId) {
         if (mContext.checkCallingOrSelfPermission(
-                Manifest.permission.WRITE_SECURE_SETTINGS) !=
+                android.Manifest.permission.WRITE_SECURE_SETTINGS) !=
                 PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Must hold permission " +
-                    Manifest.permission.WRITE_SECURE_SETTINGS);
+                    android.Manifest.permission.WRITE_SECURE_SETTINGS);
         }
         if (displayId != Display.DEFAULT_DISPLAY) {
             throw new IllegalArgumentException("Can only set the default display");
@@ -8487,10 +8487,10 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void setOverscan(int displayId, int left, int top, int right, int bottom) {
         if (mContext.checkCallingOrSelfPermission(
-                Manifest.permission.WRITE_SECURE_SETTINGS) !=
+                android.Manifest.permission.WRITE_SECURE_SETTINGS) !=
                 PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Must hold permission " +
-                    Manifest.permission.WRITE_SECURE_SETTINGS);
+                    android.Manifest.permission.WRITE_SECURE_SETTINGS);
         }
         final long ident = Binder.clearCallingIdentity();
         try {
@@ -9478,7 +9478,7 @@ public class WindowManagerService extends IWindowManager.Stub
      */
     private void handleNotObscuredLocked(final WindowState w, final long currentTime,
                                          final int innerDw, final int innerDh) {
-        final LayoutParams attrs = w.mAttrs;
+        final WindowManager.LayoutParams attrs = w.mAttrs;
         final int attrFlags = attrs.flags;
         final boolean canBeSeen = w.isDisplayedLw();
         final boolean opaqueDrawn = canBeSeen && w.isOpaqueDrawn();
@@ -9543,7 +9543,7 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     private void handleFlagDimBehind(WindowState w) {
-        final LayoutParams attrs = w.mAttrs;
+        final WindowManager.LayoutParams attrs = w.mAttrs;
         if ((attrs.flags & FLAG_DIM_BEHIND) != 0
                 && w.isDisplayedLw()
                 && !w.mExiting) {
@@ -10774,10 +10774,10 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public void statusBarVisibilityChanged(int visibility) {
-        if (mContext.checkCallingOrSelfPermission(Manifest.permission.STATUS_BAR)
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.STATUS_BAR)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("Caller does not hold permission "
-                    + Manifest.permission.STATUS_BAR);
+                    + android.Manifest.permission.STATUS_BAR);
         }
 
         synchronized (mWindowMap) {
@@ -11650,7 +11650,7 @@ public class WindowManagerService extends IWindowManager.Stub
                     throw new IllegalStateException("Magnification callbacks not set!");
                 }
             }
-            if (Binder.getCallingPid() != Process.myPid()) {
+            if (Binder.getCallingPid() != android.os.Process.myPid()) {
                 spec.recycle();
             }
         }

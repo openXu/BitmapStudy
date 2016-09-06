@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openxu.bs.androidsuorce;
+package com.android.server.am;
 
 import static com.android.server.am.ActivityManagerService.TAG;
 import static com.android.server.am.ActivityManagerService.localLOGV;
@@ -51,6 +51,7 @@ import com.android.server.am.ActivityManagerService.ItemMatcher;
 import com.android.server.am.ActivityStackSupervisor.ActivityContainer;
 import com.android.server.wm.AppTransition;
 import com.android.server.wm.TaskGroup;
+import com.android.server.wm.WindowManagerService;
 
 import android.app.Activity;
 import android.app.ActivityManager;
